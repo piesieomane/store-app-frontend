@@ -3,14 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/axios";
 import { ProductCard } from "./ProductCard";
 import { Product } from "../types/product";
+import { useAuthStore } from "../store/useAuthStore";
 
 export const ProductGrid: React.FC = () => {
+  const { user } = useAuthStore();
+
   const { data, isLoading, isError, error } = useQuery<Product[]>({
-    queryKey: ["products"],
+    queryKey: ["products", user?.id],
     queryFn: async () => {
       const { data } = await api.get<Product[]>("/products");
       return data;
     },
+    staleTime: 0,
   });
 
   if (isLoading) {
@@ -28,8 +32,6 @@ export const ProductGrid: React.FC = () => {
       </div>
     );
   }
-
-  console.log(data);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
